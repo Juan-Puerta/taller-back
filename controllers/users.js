@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/users");
 
 exports.create = async (req, res, next) => {
-  const userExist = await User.finfOne({
+  const userExist = await User.findOne({
     identification: req.body.identification,
   });
 
@@ -39,16 +39,26 @@ exports.login = async (req, res, next) => {
     res.status(400).send("Username and password are required");
   }
 
-  const userExist = await User.finfOne({ username: username });
+  const userExist = await User.findOne({ username });
+  const { _id, firstname, lastname, identification, photo, active } = userExist;
 
   if (userExist && (await bcrypt.compare(password, userExist.password))) {
     const token = jwt.sign(
-      { user_id: userExist.id, username },
+      { user_id: userExist._id, username },
       process.env.TOKENSECRET,
       { expiresIn: "2h" }
     );
     userExist.token = token;
-    res.status(200).json({ username: username, token: token });
+    res.status(200).json({
+      _id,
+      username,
+      firstname,
+      lastname,
+      identification,
+      photo,
+      active,
+      token,
+    });
   } else {
     res.status(400).send("invalid credentials");
   }
