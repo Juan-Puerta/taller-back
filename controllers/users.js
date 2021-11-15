@@ -40,9 +40,10 @@ exports.login = async (req, res, next) => {
   }
 
   const userExist = await User.findOne({ username });
-  const { _id, firstname, lastname, identification, photo, active } = userExist;
 
   if (userExist && (await bcrypt.compare(password, userExist.password))) {
+    const { _id, firstname, lastname, identification, photo, active } =
+      userExist;
     const token = jwt.sign(
       { user_id: userExist._id, username },
       process.env.TOKENSECRET,
@@ -62,4 +63,31 @@ exports.login = async (req, res, next) => {
   } else {
     res.status(400).send("invalid credentials");
   }
+};
+
+exports.index = (req, res, next) => {
+  User.find({}, (err, users) => {
+    if (err) {
+      return next(err);
+    }
+    res.send(users);
+  });
+};
+
+exports.update = (req, res, next) => {
+  User.findByIdAndUpdate(req.params.id, { $set: req.body }, (err) => {
+    if (err) {
+      return next(err);
+    }
+    res.send("User updated successfully");
+  });
+};
+
+exports.destroy = (req, res, next) => {
+  User.findByIdAndRemove(req.params.id, (err) => {
+    if (err) {
+      return next(err);
+    }
+    res.send("User deleted successfully");
+  });
 };

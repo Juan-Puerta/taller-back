@@ -5,6 +5,7 @@ exports.create = (req, res, next) => {
   let newNote = new Note({
     title: req.body.title,
     comment: req.body.comment,
+    userId: req.user.user_id,
   });
 
   newNote.save((err) => {
@@ -20,7 +21,7 @@ exports.index = (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res.send(notes);
+    res.send(notes.filter((note) => note.userId == req.user.user_id));
   });
 };
 
