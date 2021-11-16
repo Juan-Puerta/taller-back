@@ -3,8 +3,10 @@ var router = express.Router();
 const users_controller = require("../controllers/users");
 const auth = require("../middleware/auth");
 const deledit = require("../middleware/deleteAndEditUser");
+const schemaUser = require("../schemas/schemaUser");
+const validate = require("../middleware/validate");
 
-router.post("/register", users_controller.create);
+router.post("/register", validate(schemaUser.user), users_controller.create);
 router.post("/login", users_controller.login);
 
 router.get("/", users_controller.index);
